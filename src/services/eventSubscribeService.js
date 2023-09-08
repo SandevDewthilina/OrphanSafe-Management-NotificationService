@@ -1,5 +1,3 @@
-import { getUserByIdAsync } from "./userService.js";
-
 export const subscribeEvents = (payload) => {
   // parse data
   payload = JSON.parse(data.content.toString());
@@ -8,7 +6,7 @@ export const subscribeEvents = (payload) => {
 
   // manage event
   switch (event) {
-    case "DELETE_USER_BY_ID":
+    case "BROADCAST":
       break;
     default:
       break;

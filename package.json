@@ -1,7 +1,7 @@
 {
-  "name": "orphansafe-management-authenticationservice",
+  "name": "orphansafe-management-notificationservice",
   "version": "1.0.0",
-  "description": "authenticationservice for orphansafe backend",
+  "description": "notificationservice for orphansafe backend",
   "main": "index.js",
   "type": "module",
   "scripts": {
@@ -10,22 +10,22 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/SandevDewthilina/OrphanSafe-Management-AuthenticationService.git"
+    "url": "git+https://github.com/SandevDewthilina/OrphanSafe-Management-NotificationService.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/SandevDewthilina/OrphanSafe-Management-AuthenticationService/issues"
+    "url": "https://github.com/SandevDewthilina/OrphanSafe-Management-NotificationService/issues"
   },
-  "homepage": "https://github.com/SandevDewthilina/OrphanSafe-Management-AuthenticationService#readme",
+  "homepage": "https://github.com/SandevDewthilina/OrphanSafe-Management-NotificationService#readme",
   "dependencies": {
     "amqplib": "^0.10.3",
-    "bcryptjs": "^2.4.3",
     "cookie-parser": "^1.4.6",
     "dotenv": "^16.3.1",
     "express": "^4.18.2",
     "express-async-handler": "^1.2.0",
+    "firebase-admin": "^11.10.1",
     "jsonwebtoken": "^9.0.2",
     "nodemon": "^3.0.1",
     "pg": "^8.11.3",
