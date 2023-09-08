@@ -14,10 +14,10 @@ import {
 // route POST /api/notifications/broadcast
 // @access Private
 export const broadcast = asyncHandler(async (req, res) => {
-  await broadcastNotification(req.body);
+  const response = await broadcastNotification(req.body);
   return res
     .status(200)
-    .json({ success: true, message: "Notification broadcasted" });
+    .json({ success: true, results: response });
 });
 
 // @desc notification broadcast

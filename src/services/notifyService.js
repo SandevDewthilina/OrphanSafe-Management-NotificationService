@@ -1,14 +1,39 @@
 import DatabaseHandler from "../lib/database/DatabaseHandler.js";
+import {getMessaging} from 'firebase-admin/messaging'
 
-export const broadcastNotification = async (fcmToken, title, body) => {
+export const broadcastNotification = async ({title, body}) => {
+  const allTokens = await DatabaseHandler.executeSingleQueryAsync(
+    `SELECT DISTINCT "Token" FROM "PushNotificationTokens"`,
+    []
+  );
+  const tokenArray = allTokens.map((item) => item.Token);
   const message = {
     notification: {
       title: title,
-      body: body,
+      body: body
     },
-    token: fcmToken,
+    tokens: tokenArray
+  }
+
+  const response = await getMessaging().sendEachForMulticast(message);
+  const failedTokens = [];
+  const successTokens = []
+
+  if (response.failureCount > 0) {
+    response.responses.forEach((resp, idx) => {
+      if (!resp.success) {
+        failedTokens.push(tokenArray[idx]);
+      } else {
+        successTokens.push(tokenArray[idx])
+      }
+    });
+  }
+
+  return {
+    response: response,
+    successTokens: successTokens,
+    failedTokens: failedTokens
   };
-  return true;
   // TODO
 };
 
