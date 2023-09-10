@@ -1,5 +1,5 @@
 import asyncHandler from "express-async-handler";
-import { verifyJWT } from "../utils/index.js";
+import { verifyJWT, verifyAppPassToken } from "../utils/index.js";
 
 const protect = asyncHandler(async (req, res, next) => {
   let token;
@@ -8,18 +8,25 @@ const protect = asyncHandler(async (req, res, next) => {
   if (token) {
     try {
       const decoded = verifyJWT(token);
-      console.log('JWT token verfied', token)
       req.userInfo = decoded;
       next();
     } catch (err) {
       res.status(401);
-      console.log("invalid token")
       throw new Error("Not authorized, invalid token");
     }
   } else {
-    res.status(401);
-    console.log("no token")
-    throw new Error("Not authorized, no token");
+    const appPass = req.cookies.appPass;
+    if (appPass) {
+      if (verifyAppPassToken(appPass)) {
+        next();
+      } else {
+        res.status(401);
+        throw new Error("Not authorized, invalid app secret");
+      }
+    } else {
+      res.status(401);
+      throw new Error("Not authorized, no token");
+    }
   }
 });
 
