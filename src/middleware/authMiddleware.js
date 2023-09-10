@@ -8,6 +8,7 @@ const protect = asyncHandler(async (req, res, next) => {
   if (token) {
     try {
       const decoded = verifyJWT(token);
+      console.log('JWT token verfied', token)
       req.userInfo = decoded;
       next();
     } catch (err) {

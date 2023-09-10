@@ -1,7 +1,7 @@
 import DatabaseHandler from "../lib/database/DatabaseHandler.js";
-import {getMessaging} from 'firebase-admin/messaging'
+import { getMessaging } from "firebase-admin/messaging";
 
-export const broadcastNotification = async ({title, body}) => {
+export const broadcastNotification = async ({ title, body }) => {
   const allTokens = await DatabaseHandler.executeSingleQueryAsync(
     `SELECT DISTINCT "Token" FROM "PushNotificationTokens"`,
     []
@@ -10,21 +10,21 @@ export const broadcastNotification = async ({title, body}) => {
   const message = {
     notification: {
       title: title,
-      body: body
+      body: body,
     },
-    tokens: tokenArray
-  }
+    tokens: tokenArray,
+  };
 
   const response = await getMessaging().sendEachForMulticast(message);
   const failedTokens = [];
-  const successTokens = []
+  const successTokens = [];
 
   if (response.failureCount > 0) {
     response.responses.forEach((resp, idx) => {
       if (!resp.success) {
         failedTokens.push(tokenArray[idx]);
       } else {
-        successTokens.push(tokenArray[idx])
+        successTokens.push(tokenArray[idx]);
       }
     });
   }
@@ -32,12 +32,12 @@ export const broadcastNotification = async ({title, body}) => {
   return {
     response: response,
     successTokens: successTokens,
-    failedTokens: failedTokens
+    failedTokens: failedTokens,
   };
   // TODO
 };
 
-export const patchFCMToken = async ({ userId, token }) => {
+export const patchFCMToken = async ({ userId, deviceId, token }) => {
   const currentToken = await DatabaseHandler.executeSingleQueryAsync(
     `SELECT * FROM "PushNotificationTokens" WHERE "UserId" = $1`,
     [userId]
@@ -45,17 +45,17 @@ export const patchFCMToken = async ({ userId, token }) => {
   if (currentToken.length === 0) {
     // not exists
     const results = await DatabaseHandler.executeSingleQueryAsync(
-      `INSERT INTO "PushNotificationTokens" VALUES ($1, $2) RETURNING *;`,
-      [userId, token]
+      `INSERT INTO "PushNotificationTokens" VALUES ($1, $2, $3) RETURNING *;`,
+      [userId, deviceId, token]
     );
   } else {
     // exists
-    const { UserId, Token } = currentToken[0];
+    const { UserId, deviceId,Token } = currentToken[0];
     if (Token !== token) {
       const results = await DatabaseHandler.executeSingleQueryAsync(
         `UPDATE "PushNotificationTokens" SET "Token" = $1
-        WHERE "UserId" = $2 RETURNING *;`,
-        [token, userId]
+        WHERE "UserId" = $2 and "DeviceId" = $3 RETURNING *;`,
+        [token, userId, deviceId]
       );
     }
   }
