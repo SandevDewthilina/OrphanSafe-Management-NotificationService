@@ -37,6 +37,7 @@ export const publishMessage = async (channel, binding_key, message) => {
 };
 
 // consume a message
+// binding_key is this service binding key value
 export const subscribeMessage = async (channel, binding_key) => {
   try {
     // create a queue
@@ -46,9 +47,9 @@ export const subscribeMessage = async (channel, binding_key) => {
     channel.bindQueue(appQueue.queue, EXCHANGE_NAME, binding_key);
 
     // consume data
-    channel.consume(appQueue.queue, (data) => {
+    channel.consume(appQueue.queue, async (data) => {
       // subscribe to data
-      subscribeEvents(data.content.toString());
+      await subscribeEvents(JSON.parse(data.content.toString()));
       // acknowledge queue
       channel.ack(data);
     });
@@ -63,6 +64,10 @@ export const RPCObserver = async (RPC_QUEUE_NAME) => {
   await initChannel();
 
   const channel = await getChannel();
+
+  // subscribe to async consumers
+  await subscribeMessage(channel, RPC_QUEUE_NAME);
+
   // listen on RPC_QUEUE
   await channel.assertQueue(RPC_QUEUE_NAME, {
     durable: false,
@@ -105,15 +110,15 @@ const requestData = async (RPC_QUEUE_NAME, payload, uuid) => {
 
   return new Promise((resolve, reject) => {
     const timeout = setTimeout(() => {
-      channel.close()
-      reject("API was not responding, timedout after 10 seconds")
+      channel.close();
+      reject("API was not responding, timedout after 10 seconds");
     }, 10000);
     channel.consume(
       q.queue,
       (msg) => {
         if (msg.properties.correlationId === uuid) {
           resolve(JSON.parse(msg.content.toString()));
-          clearTimeout(timeout)
+          clearTimeout(timeout);
         } else {
           reject("data not found");
         }
