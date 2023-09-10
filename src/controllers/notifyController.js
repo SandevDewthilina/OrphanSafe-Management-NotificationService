@@ -20,8 +20,8 @@ export const broadcast = asyncHandler(async (req, res) => {
     .json({ success: true, results: response });
 });
 
-// @desc notification broadcast
-// route POST /api/notifications/broadcast
+// @desc FCM Token Patch
+// route POST /api/notifications/patchToken
 // @access Private
 export const syncFCMToken = asyncHandler(async (req, res) => {
   const latestToken = await patchFCMToken(req.body);
