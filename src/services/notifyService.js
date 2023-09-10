@@ -50,12 +50,12 @@ export const patchFCMToken = async ({ userId, deviceId, token }) => {
     );
   } else {
     // exists
-    const { UserId, deviceId,Token } = currentToken[0];
+    const { UserId, DeviceId,Token } = currentToken[0];
     if (Token !== token) {
       const results = await DatabaseHandler.executeSingleQueryAsync(
         `UPDATE "PushNotificationTokens" SET "Token" = $1
         WHERE "UserId" = $2 and "DeviceId" = $3 RETURNING *;`,
-        [token, userId, deviceId]
+        [Token, UserId, DeviceId]
       );
     }
   }
