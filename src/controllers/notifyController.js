@@ -4,11 +4,7 @@ import {
   broadcastNotification,
   patchFCMToken,
 } from "../services/notifyService.js";
-import {
-  getChannel,
-  publishMessage,
-  subscribeMessage,
-} from "../lib/rabbitmq/index.js";
+
 
 // @desc notification broadcast
 // route POST /api/notifications/broadcast
