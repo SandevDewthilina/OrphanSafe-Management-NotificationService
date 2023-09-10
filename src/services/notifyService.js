@@ -39,13 +39,13 @@ export const broadcastNotification = async ({ title, body }) => {
 
 export const patchFCMToken = async ({ userId, deviceId, token }) => {
   const currentToken = await DatabaseHandler.executeSingleQueryAsync(
-    `SELECT * FROM "PushNotificationTokens" WHERE "UserId" = $1`,
-    [userId]
+    `SELECT * FROM "PushNotificationTokens" WHERE "UserId" = $1 AND "DeviceId" = $2`,
+    [userId, deviceId]
   );
   if (currentToken.length === 0) {
     // not exists
     const results = await DatabaseHandler.executeSingleQueryAsync(
-      `INSERT INTO "PushNotificationTokens" VALUES ($1, $2, $3) RETURNING *;`,
+      `INSERT INTO "PushNotificationTokens" ("UserId","DeviceId","Token") VALUES ($1, $2, $3) RETURNING *;`,
       [userId, deviceId, token]
     );
   } else {
