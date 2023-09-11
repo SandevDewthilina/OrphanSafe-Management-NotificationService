@@ -1,6 +1,6 @@
 import amqplib from "amqplib";
 import { v4 as uuid4 } from "uuid";
-import { MESSAGE_BROKER_URL, EXCHANGE_NAME } from "../../config/index.js";
+import { MESSAGE_BROKER_URL, EXCHANGE_NAME, NOTIFICATION_SERVICE_BINDING_KEY } from "../../config/index.js";
 import { subscribeEvents } from "../../services/eventSubscribeService.js";
 /* <===================RABBITMQ UTILS====================> */
 
@@ -66,7 +66,7 @@ export const RPCObserver = async (RPC_QUEUE_NAME) => {
   const channel = await getChannel();
 
   // subscribe to async consumers
-  await subscribeMessage(channel, RPC_QUEUE_NAME);
+  await subscribeMessage(channel, NOTIFICATION_SERVICE_BINDING_KEY);
 
   // listen on RPC_QUEUE
   await channel.assertQueue(RPC_QUEUE_NAME, {
