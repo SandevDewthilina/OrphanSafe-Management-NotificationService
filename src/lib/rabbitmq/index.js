@@ -3,7 +3,7 @@ import { v4 as uuid4 } from "uuid";
 import {
   MESSAGE_BROKER_URL,
   EXCHANGE_NAME,
-  NOTIFICATION_SERVICE_BINDING_KEY
+  NOTIFICATION_SERVICE_BINDING_KEY,
 } from "../../config/index.js";
 import { subscribeEvents } from "../../services/eventSubscribeService.js";
 /* <===================RABBITMQ UTILS====================> */
@@ -45,10 +45,10 @@ export const subscribeMessage = async (channel, binding_key) => {
 
   channel.consume(
     q.queue,
-    (msg) => {
+    async (msg) => {
       if (msg.content) {
         console.log("the message is:", msg.content.toString());
-        subscribeEvents(JSON.parse(msg.content.toString()));
+        await subscribeEvents(JSON.parse(msg.content.toString()));
       }
       console.log("[X] received");
     },
@@ -108,7 +108,7 @@ export const RPCRequest = async (RPC_QUEUE_NAME, requestPayload) => {
 export const RPCObserver = async (RPC_QUEUE_NAME) => {
   const channel = await getChannel();
 
-  await subscribeMessage(channel, NOTIFICATION_SERVICE_BINDING_KEY)
+  await subscribeMessage(channel, NOTIFICATION_SERVICE_BINDING_KEY);
 
   await channel.assertQueue(RPC_QUEUE_NAME, {
     durable: false,
@@ -120,7 +120,7 @@ export const RPCObserver = async (RPC_QUEUE_NAME) => {
       if (msg.content) {
         // DB Operation
         const payload = JSON.parse(msg.content.toString());
-        const response = await subscribeEvents(payload)
+        const response = await subscribeEvents(payload);
         channel.sendToQueue(
           msg.properties.replyTo,
           Buffer.from(JSON.stringify(response)),
@@ -136,4 +136,3 @@ export const RPCObserver = async (RPC_QUEUE_NAME) => {
     }
   );
 };
-

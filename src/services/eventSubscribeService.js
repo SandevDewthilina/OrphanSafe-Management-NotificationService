@@ -1,7 +1,7 @@
-import { unicastNotification } from "../services/notifyService.js";
+import { unicastNotification, sendEmail } from "../services/notifyService.js";
 
 export const subscribeEvents = async (payload) => {
-  const {  event, data } = payload;
+  const { event, data } = payload;
   // parse data
   console.log("Received data from notification service", data);
 
@@ -10,8 +10,12 @@ export const subscribeEvents = async (payload) => {
     case "UNICAST":
       const { notification, userId } = data;
       const { title, body } = notification;
-      const response = await unicastNotification({title, body, userId});
-      console.log("notification send response", response)
+      const response = await unicastNotification({ title, body, userId });
+      console.log("notification send response", response);
+      break;
+    case "SEND_EMAIL":
+       const emailResponse = await sendEmail(data);
+       console.log(emailResponse)
       break;
     default:
       break;

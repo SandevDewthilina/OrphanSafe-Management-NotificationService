@@ -1,5 +1,8 @@
 import DatabaseHandler from "../lib/database/DatabaseHandler.js";
 import { getMessaging } from "firebase-admin/messaging";
+import nodemailer from "nodemailer";
+import Mailgen from "mailgen";
+import { EMAIL, EMAIL_PASSWORD } from "../config/index.js";
 
 export const broadcastNotification = async ({ title, body }) => {
   const allTokens = await DatabaseHandler.executeSingleQueryAsync(
@@ -102,4 +105,41 @@ export const patchFCMToken = async ({ userId, deviceId, token }) => {
     }
   }
   return token;
+};
+
+export const sendEmail = async ({ receiverEmail, subject, emailContent }) => {
+  const config = {
+    service: "gmail",
+    auth: {
+      user: EMAIL,
+      pass: EMAIL_PASSWORD,
+    },
+  };
+
+  const MailGenerator = new Mailgen({
+    theme: "default",
+    product: {
+      name: "OrphanSafe",
+      link: "https://orphansafe-management.ecodeit.com",
+    },
+  });
+
+
+  const mail = MailGenerator.generate(emailContent);
+
+  let message = {
+    from: EMAIL,
+    to: receiverEmail,
+    subject: subject,
+    html: mail,
+  };
+
+  const transporter = nodemailer.createTransport(config);
+
+  try {
+    await transporter.sendMail(message);
+    return `email sent to ${receiverEmail}`;
+  } catch (e) {
+    return e.message;
+  }
 };
