@@ -119,15 +119,19 @@ export const RPCObserver = async (RPC_QUEUE_NAME) => {
     async (msg) => {
       if (msg.content) {
         // DB Operation
-        const payload = JSON.parse(msg.content.toString());
-        const response = await subscribeEvents(payload);
-        channel.sendToQueue(
-          msg.properties.replyTo,
-          Buffer.from(JSON.stringify(response)),
-          {
-            correlationId: msg.properties.correlationId,
-          }
-        );
+        try {
+          const payload = JSON.parse(msg.content.toString());
+          const response = await subscribeEvents(payload);
+          channel.sendToQueue(
+            msg.properties.replyTo,
+            Buffer.from(JSON.stringify(response)),
+            {
+              correlationId: msg.properties.correlationId,
+            }
+          );
+        } catch (err) {
+          console.log(err);
+        }
         channel.ack(msg);
       }
     },
